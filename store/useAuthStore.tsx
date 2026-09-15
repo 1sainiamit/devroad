@@ -1,7 +1,7 @@
 "use client";
 
 import { createStore, useStore as useZustandStore } from 'zustand';
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export type User = {
   id: string;
@@ -38,6 +38,10 @@ export const AuthStoreContext = createContext<AuthStore | null>(null);
 
 export function AuthStoreProvider({ children, user }: { children: ReactNode, user: User }) {
   const [store] = useState(() => createAuthStore({ user, isAuthenticated: !!user }));
+  
+  useEffect(() => {
+    store.setState({ user, isAuthenticated: !!user });
+  }, [user, store]);
   return (
     <AuthStoreContext.Provider value={store}>
       {children}

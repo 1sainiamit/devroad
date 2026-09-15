@@ -19,6 +19,8 @@ export const metadata: Metadata = {
 
 import { getCurrentUser } from "@/lib/session";
 import { AuthStoreProvider } from "@/store/useAuthStore";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const user = await getCurrentUser();
@@ -30,7 +32,10 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <AuthStoreProvider user={user}>
-          {children}
+          <TooltipProvider>
+            {children}
+            <Toaster position="bottom-right" />
+          </TooltipProvider>
         </AuthStoreProvider>
       </body>
     </html>
