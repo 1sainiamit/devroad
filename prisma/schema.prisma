@@ -7,14 +7,133 @@ datasource db {
   provider = "postgresql"
 }
 
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
 
 model User {
   id             String   @id @default(cuid())
   name           String?
   email          String   @unique
   hashedPassword String?
-  createdAt      DateTime @default(now()) @map(name: "created_at")
-  updatedAt      DateTime @updatedAt @map(name: "updated_at")
+  username       String?  @unique
+  bio            String?
+  avatarUrl      String?  @map("avatar_url")
+  refreshTokens  RefreshToken[]
 
-  @@map(name: "users")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  products       Product[]
+  orders         Order[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model Product {
+  id            String        @id @default(cuid())
+  creatorId     String        @map("creator_id")
+
+  name          String
+  slug          String
+  description   String?
+  coverImageUrl String?       @map("cover_image_url")
+
+  priceInCents  Int           @map("price_in_cents")
+  currency      String        @default("USD")
+
+  status        ProductStatus @default(DRAFT)
+
+  publishedAt   DateTime?     @map("published_at")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  creator       User          @relation(fields: [creatorId], references: [id])
+  files         ProductFile[]
+  orderItems    OrderItem[]
+
+  @@unique([creatorId, slug])
+  @@index([creatorId])
+  @@index([status])
+  @@map("products")
+}
+
+model ProductFile {
+  id          String   @id @default(cuid())
+  productId   String   @map("product_id")
+
+  name        String
+  storageKey  String   @map("storage_key")
+  sizeInBytes BigInt?  @map("size_in_bytes")
+  contentType String?  @map("content_type")
+
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_files")
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  buyerId      String      @map("buyer_id")
+
+  status       OrderStatus @default(PENDING)
+
+  totalInCents Int         @map("total_in_cents")
+  currency     String      @default("USD")
+
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+
+  buyer        User        @relation(fields: [buyerId], references: [id])
+
+  items        OrderItem[]
+
+  @@index([buyerId])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id               String   @id @default(cuid())
+  orderId          String   @map("order_id")
+  productId        String   @map("product_id")
+
+  // Snapshot of the product at purchase time
+  productName      String   @map("product_name")
+  unitPriceInCents Int      @map("unit_price_in_cents")
+  quantity         Int      @default(1)
+
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  order            Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  product          Product  @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
 }
