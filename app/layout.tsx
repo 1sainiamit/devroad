@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Gumroad Clone",
+  title: "Devroad",
   description: "A platform for creators to sell digital products",
 };
 

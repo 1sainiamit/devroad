@@ -28,39 +28,39 @@ export default async function proxy(request: NextRequest) {
   const accessToken = request.cookies.get('access_token')?.value;
   const refreshToken = request.cookies.get('refresh_token')?.value;
 
+  let isValidSession = false;
+
+  if (accessToken) {
+    const payload = await verifyAccessToken(accessToken);
+    if (payload) {
+      isValidSession = true;
+    }
+  }
+
+  // If the access token is missing or expired, but we have a refresh token,
+  // redirect to the refresh endpoint so that cookies are updated BEFORE
+  // the page is server-rendered. This prevents the "Login" button flicker.
+  if (!isValidSession && refreshToken) {
+    const url = new URL('/api/auth/refresh', request.url);
+    url.searchParams.set('redirect_to', pathname + request.nextUrl.search);
+    return NextResponse.redirect(url);
+  }
+
   if (isAuthRoute) {
-    if (accessToken || refreshToken) {
+    if (isValidSession) {
       // If user is already authenticated, redirect away from login/signup to the dashboard
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
     return NextResponse.next();
   }
 
-  if (!isProtectedRoute) {
-    return NextResponse.next();
+  if (isProtectedRoute && !isValidSession) {
+    // No valid tokens, redirect to login
+    const loginUrl = new URL('/login', request.url);
+    return NextResponse.redirect(loginUrl);
   }
 
-
-
-  if (accessToken) {
-    const payload = await verifyAccessToken(accessToken);
-    if (payload) {
-      // Access token is valid, allow request
-      return NextResponse.next();
-    }
-  }
-
-  if (refreshToken) {
-    // Access token is invalid/missing, but we have a refresh token.
-    // Redirect to the refresh route handler to rotate tokens, then bounce back.
-    const url = new URL('/api/auth/refresh', request.url);
-    url.searchParams.set('redirect_to', pathname + request.nextUrl.search);
-    return NextResponse.redirect(url);
-  }
-
-  // No tokens, redirect to login
-  const loginUrl = new URL('/login', request.url);
-  return NextResponse.redirect(loginUrl);
+  return NextResponse.next();
 }
 
 export const config = {

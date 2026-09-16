@@ -11,7 +11,7 @@ import {
   SidebarHeader,
   SidebarFooter,
 } from "@/components/ui/sidebar";
-import { Home, Package, ShoppingCart, BarChart3, Settings, LogOut, Compass } from "lucide-react";
+import { Home, Package, ShoppingCart, BarChart3, Settings, LogOut, Compass, BookOpen, Wallet } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -24,7 +24,9 @@ const navItems = [
   { title: "Products", url: "/products", icon: Package },
   { title: "Sales", url: "/sales", icon: ShoppingCart },
   { title: "Analytics", url: "/analytics", icon: BarChart3 },
+  { title: "Payouts", url: "/payouts", icon: Wallet },
   { title: "Discover", url: "/discover", icon: Compass },
+  { title: "Library", url: "/library", icon: BookOpen },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
@@ -37,7 +39,7 @@ export function AppSidebar() {
       <SidebarHeader className="p-6 border-b-2 border-black">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-black rounded-full" />
-          <Link href="/" className="font-black text-xl tracking-tighter">GumroadClone</Link>
+          <Link href="/" className="font-black text-xl tracking-tighter">Devroad</Link>
         </div>
       </SidebarHeader>
 

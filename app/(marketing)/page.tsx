@@ -15,7 +15,7 @@ export default function Home() {
             Go from<br />zero to $1.
           </h1>
           <p className="text-xl md:text-2xl font-medium mb-12 max-w-md">
-            With GumroadClone, anyone can earn their first dollar online. Just start with what you know, see what sticks, and get paid. It's that easy.
+            With Devroad, anyone can earn their first dollar online. Just start with what you know, see what sticks, and get paid. It's that easy.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Button asChild size="lg" className="bg-secondary text-black hover:bg-secondary/90 text-xl h-16 px-8 w-full sm:w-auto">
@@ -51,7 +51,7 @@ export default function Home() {
               </div>
               <h3 className="text-2xl font-bold mb-4">Sell anything</h3>
               <p className="text-lg font-medium leading-relaxed">
-                Video lessons, monthly subscriptions, physical products, whatever! GumroadClone was created to help you experiment with all kinds of ideas and formats.
+                Video lessons, monthly subscriptions, physical products, whatever! Devroad was created to help you experiment with all kinds of ideas and formats.
               </p>
             </CardContent>
           </Card>
@@ -97,7 +97,7 @@ export default function Home() {
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 bg-black rounded-full" />
-            <span className="font-bold text-xl tracking-tighter">GumroadClone</span>
+            <span className="font-bold text-xl tracking-tighter">Devroad</span>
           </div>
           <div className="flex gap-6 font-bold text-sm md:text-base">
             <Link href="#" className="hover:underline decoration-2 underline-offset-4">Help</Link>

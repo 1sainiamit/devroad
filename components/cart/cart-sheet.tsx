@@ -15,7 +15,7 @@ interface CartSheetProps {
 }
 
 export function CartSheet({ open, onOpenChange }: CartSheetProps) {
-  const { items, updateQuantity, removeItem, clearCart, cartTotal, itemCount } = useCartStore();
+  const { items, updateQuantity, removeItem, cartTotal, itemCount } = useCartStore();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const formattedTotal = new Intl.NumberFormat("en-US", {
@@ -24,13 +24,35 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
   }).format(cartTotal / 100);
 
   const handleCheckout = async () => {
-    setIsCheckingOut(true);
-    // Simulate checkout
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsCheckingOut(false);
-    clearCart();
-    onOpenChange(false);
-    toast.success("Checkout successful! Thank you for your purchase.");
+    try {
+      setIsCheckingOut(true);
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: items.map((item) => ({
+            productId: item.product.id,
+            quantity: item.quantity,
+          })),
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        toast.error(error || "Something went wrong during checkout.");
+        setIsCheckingOut(false);
+        return;
+      }
+
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("An error occurred during checkout.");
+      setIsCheckingOut(false);
+    }
   };
 
   return (

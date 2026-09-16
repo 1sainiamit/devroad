@@ -12,7 +12,7 @@ export function Navbar() {
       <div className="flex items-center gap-2">
         <Link href="/" className="flex items-center gap-2">
           <div className="w-8 h-8 bg-black rounded-full" />
-          <span className="font-bold text-2xl tracking-tighter">GumroadClone</span>
+          <span className="font-bold text-2xl tracking-tighter">Devroad</span>
         </Link>
       </div>
       

@@ -53,7 +53,7 @@ export function DiscoverNavbar() {
       <div className="flex items-center gap-4 px-6 py-3">
         {/* Logo */}
         <Link href="/" className="flex items-center">
-          <span className="font-bold text-3xl tracking-tighter text-white">gumroad</span>
+          <span className="font-bold text-3xl tracking-tighter text-white">Devroad</span>
         </Link>
 
         {/* Search Bar */}
