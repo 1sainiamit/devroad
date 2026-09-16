@@ -17,7 +17,7 @@ import { Loader2 } from "lucide-react";
 const ProductSchema = z.object({
   name: z.string().min(3, "Product name must be at least 3 characters long"),
   description: z.string().min(10, "Description must be at least 10 characters long"),
-  priceInCents: z.string().refine((value) => {
+  price: z.string().refine((value) => {
     const num = parseInt(value, 10);
     return !isNaN(num) && num >= 0;
   }, "Invalid price amount"),
@@ -36,8 +36,8 @@ export default function NewProduct() {
     const data = {
       name: formData.get("name") as string,
       description: formData.get("description") as string,
-      priceInCents: formData.get("priceInCents") as string,
-      currency: formData.get("currency") as string || "USD",
+      price: formData.get("price") as string,
+      currency: formData.get("currency") as string || "INR",
       status: formData.get("status") as "DRAFT" | "PUBLISHED",
     };
 
@@ -45,7 +45,7 @@ export default function NewProduct() {
 
     if (!result.success) {
       toast.error("Validation error", {
-        description: result.error.errors[0].message,
+        description: result.error.issues[0].message,
       });
       return;
     }
@@ -143,16 +143,16 @@ export default function NewProduct() {
           <CardContent className="space-y-6 pt-6">
             <div className="grid sm:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="priceInCents" className="font-bold text-base">Price (in cents)</Label>
+                <Label htmlFor="price" className="font-bold text-base">Price (in ₹)</Label>
                 <div className="relative">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-black text-muted-foreground">
-                    $
+                    ₹
                   </div>
                   <Input
-                    id="priceInCents"
-                    name="priceInCents"
+                    id="price"
+                    name="price"
                     type="number"
-                    placeholder="5000"
+                    placeholder="50"
                     className="h-14 pl-10 pr-4 text-2xl font-black border-2 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus-visible:ring-0 focus-visible:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all"
                     min="0"
                     required
@@ -160,20 +160,18 @@ export default function NewProduct() {
                   />
                 </div>
                 <p className="text-sm font-bold text-muted-foreground mt-1">
-                  e.g., 5000 = $50.00
+                  e.g., 50 = ₹50
                 </p>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="currency" className="font-bold text-base">Currency</Label>
-                <Select name="currency" defaultValue="USD" disabled={isPending}>
+                <Select name="currency" defaultValue="INR" disabled={isPending}>
                   <SelectTrigger className="h-14 border-2 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:ring-0 focus-visible:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-lg font-bold">
                     <SelectValue placeholder="Select currency" />
                   </SelectTrigger>
                   <SelectContent className="border-2 border-black rounded-none font-bold">
-                    <SelectItem value="USD">USD ($)</SelectItem>
-                    <SelectItem value="EUR">EUR (€)</SelectItem>
-                    <SelectItem value="GBP">GBP (£)</SelectItem>
+                    <SelectItem value="INR">INR (₹)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

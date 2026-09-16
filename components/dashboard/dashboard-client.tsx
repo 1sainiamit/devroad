@@ -46,7 +46,7 @@ export function DashboardClient({ totalRevenue, totalSales }: DashboardClientPro
             <DollarSign className="h-4 w-4 text-black" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-black">${(totalRevenue / 100).toFixed(2)}</div>
+            <div className="text-3xl font-black">₹{totalRevenue}</div>
             <p className="text-xs font-bold text-muted-foreground flex items-center gap-1 mt-1">
               <ArrowUpRight className="w-3 h-3 text-green-600" />
               +0% from last month
@@ -133,7 +133,7 @@ export function DashboardClient({ totalRevenue, totalSales }: DashboardClientPro
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
-                    tickFormatter={(value) => `$${value}`}
+                    tickFormatter={(value) => `₹${value}`}
                     fontFamily="inherit"
                     fontWeight="bold"
                   />

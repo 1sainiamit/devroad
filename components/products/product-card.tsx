@@ -6,7 +6,7 @@ interface ProductCardProps {
   product: {
     name: string;
     slug: string;
-    priceInCents: number;
+    price: number;
     currency: string;
     coverImageUrl: string | null;
     creator: {
@@ -18,11 +18,11 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const formattedPrice = new Intl.NumberFormat("en-US", {
+  const formattedPrice = new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: product.currency || "USD",
+    currency: product.currency || "INR",
     minimumFractionDigits: 0,
-  }).format(product.priceInCents / 100);
+  }).format(product.price);
 
   const creatorName = product.creator.name || product.creator.username || "Anonymous";
 
@@ -95,7 +95,7 @@ export function ProductCard({ product }: ProductCardProps) {
           className="inline-block bg-[#ff90e8] text-black font-medium text-xl px-5 py-2"
           style={{ clipPath: "polygon(0% 0%, 100% 0%, 75% 50%, 100% 100%, 0% 100%)" }}
         >
-          {product.priceInCents === 0 ? "Free+" : `${formattedPrice}+`}
+          {product.price === 0 ? "Free+" : `${formattedPrice}+`}
         </div>
       </div>
     </Link>

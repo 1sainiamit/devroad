@@ -21,6 +21,7 @@ import { getCurrentUser } from "@/lib/session";
 import { AuthStoreProvider } from "@/store/useAuthStore";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
+import Script from "next/script";
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const user = await getCurrentUser();
@@ -30,6 +31,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${spaceGrotesk.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="beforeInteractive" />
+      </head>
       <body className="min-h-full flex flex-col">
         <AuthStoreProvider user={user}>
           <TooltipProvider>

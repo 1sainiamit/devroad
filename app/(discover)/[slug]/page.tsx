@@ -103,7 +103,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 product={{
                   id: product.id,
                   name: product.name,
-                  priceInCents: product.priceInCents,
+                  price: product.price,
                   currency: product.currency,
                   coverImageUrl: product.coverImageUrl,
                   creatorName: creatorName,

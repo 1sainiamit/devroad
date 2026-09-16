@@ -32,11 +32,11 @@ export default async function SalesPage() {
   });
 
   const sales = orderItems.map(item => {
-    const amountInDollars = (item.unitPriceInCents * item.quantity) / 100;
-    const formattedAmount = new Intl.NumberFormat('en-US', {
+    const amountInRupees = item.price * item.quantity;
+    const formattedAmount = new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD'
-    }).format(amountInDollars);
+      currency: 'INR'
+    }).format(amountInRupees);
 
     const formattedDate = new Intl.DateTimeFormat('en-US', {
       month: 'short',

@@ -42,7 +42,7 @@ export async function getProducts() {
 type CreateProductInput = {
   name: string;
   description: string;
-  priceInCents: string;
+  price: string;
   currency?: string;
   status: "DRAFT" | "PUBLISHED";
 };
@@ -62,8 +62,8 @@ export async function createProduct(data: CreateProductInput) {
         name: data.name,
         slug: slug,
         description: data.description,
-        priceInCents: parseInt(data.priceInCents, 10),
-        currency: data.currency || "USD",
+        price: parseInt(data.price, 10),
+        currency: data.currency || "INR",
         status: data.status,
         creatorId: user.id,
       },
@@ -87,7 +87,7 @@ export async function createProduct(data: CreateProductInput) {
 type UpdateProductInput = {
   name: string;
   description: string;
-  priceInCents: string;
+  price: string;
 };
 
 export async function updateProduct(productId: string, data: UpdateProductInput) {
@@ -109,7 +109,7 @@ export async function updateProduct(productId: string, data: UpdateProductInput)
         name: data.name,
         slug: slug,
         description: data.description,
-        priceInCents: parseInt(data.priceInCents, 10),
+        price: parseInt(data.price, 10),
       },
     });
 

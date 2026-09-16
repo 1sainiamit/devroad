@@ -60,7 +60,7 @@ export default async function ProductsPage() {
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <div className="font-black text-lg">${(product.priceInCents / 100).toFixed(2)}</div>
+                    <div className="font-black text-lg">₹{product.price}</div>
                     <div className={`text-xs font-bold px-2 py-0.5 rounded-full inline-block mt-1 ${product.status === "PUBLISHED" ? "text-green-600 bg-green-100" : "text-amber-600 bg-amber-100"
                       }`}>
                       {product.status}

@@ -10,7 +10,7 @@ interface BuyButtonProps {
   product: {
     id: string;
     name: string;
-    priceInCents: number;
+    price: number;
     currency: string;
     coverImageUrl: string | null;
     creatorName: string;
@@ -22,10 +22,10 @@ export function BuyButton({ product }: BuyButtonProps) {
   const [isPending, setIsPending] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
 
-  const formattedPrice = new Intl.NumberFormat("en-US", {
+  const formattedPrice = new Intl.NumberFormat("en-IN", {
     style: "currency",
-    currency: product.currency || "USD",
-  }).format(product.priceInCents / 100);
+    currency: product.currency || "INR",
+  }).format(product.price);
 
   const handleBuy = async () => {
     setIsPending(true);
@@ -45,7 +45,7 @@ export function BuyButton({ product }: BuyButtonProps) {
       {isPending ? (
         <Loader2 className="w-6 h-6 animate-spin text-black" />
       ) : (
-        product.priceInCents === 0 ? "I want this!" : `Add to cart - ${formattedPrice}`
+        product.price === 0 ? "I want this!" : `Add to cart - ${formattedPrice}`
       )}
     </Button>
   );

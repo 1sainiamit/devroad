@@ -26,7 +26,7 @@ export default async function DashboardPage() {
   let totalSales = 0;
 
   orderItems.forEach((item) => {
-    totalRevenue += item.unitPriceInCents * item.quantity;
+    totalRevenue += item.price * item.quantity;
     totalSales += item.quantity;
   });
 

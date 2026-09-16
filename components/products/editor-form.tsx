@@ -23,6 +23,14 @@ export function EditorForm({ product }: { product: ProductWithFiles }) {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Check file size (50MB limit)
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("File is too large. Maximum size is 5MB.");
+      event.target.value = '';
+      return;
+    }
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("productId", product.id);
@@ -56,7 +64,7 @@ export function EditorForm({ product }: { product: ProductWithFiles }) {
   const handleUpdateDetails = (formData: FormData) => {
     const data = {
       name: formData.get("name") as string,
-      priceInCents: formData.get("priceInCents") as string,
+      price: formData.get("price") as string,
       description: formData.get("description") as string,
     };
 
@@ -216,16 +224,16 @@ export function EditorForm({ product }: { product: ProductWithFiles }) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="priceInCents" className="font-bold text-base">Price (in cents)</Label>
+                <Label htmlFor="price" className="font-bold text-base">Price (in ₹)</Label>
                 <div className="relative">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-black text-muted-foreground">
-                    $
+                    ₹
                   </div>
                   <Input
-                    id="priceInCents"
-                    name="priceInCents"
+                    id="price"
+                    name="price"
                     type="number"
-                    defaultValue={product.priceInCents}
+                    defaultValue={product.price}
                     required
                     disabled={isPending}
                     min="1"

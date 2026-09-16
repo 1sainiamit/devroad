@@ -28,7 +28,7 @@ model User {
   username       String?  @unique
   bio            String?
   avatarUrl      String?  @map("avatar_url")
-  stripeConnectAccountId String? @unique @map("stripe_connect_account_id")
+  razorpayAccountId String? @unique @map("razorpay_account_id")
   refreshTokens  RefreshToken[]
 
   createdAt      DateTime @default(now()) @map("created_at")
@@ -61,8 +61,8 @@ model Product {
   description   String?
   coverImageUrl String?       @map("cover_image_url")
 
-  priceInCents  Int           @map("price_in_cents")
-  currency      String        @default("USD")
+  price         Int
+  currency      String        @default("INR")
 
   status        ProductStatus @default(DRAFT)
 
@@ -103,10 +103,11 @@ model Order {
 
   status       OrderStatus @default(PENDING)
 
-  totalInCents    Int         @map("total_in_cents")
-  currency        String      @default("USD")
+  total           Int
+  currency        String      @default("INR")
   
-  stripeSessionId String?     @unique @map("stripe_session_id")
+  razorpayOrderId   String?     @unique @map("razorpay_order_id")
+  razorpayPaymentId String?     @unique @map("razorpay_payment_id")
 
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")
@@ -127,7 +128,7 @@ model OrderItem {
 
   // Snapshot of the product at purchase time
   productName      String   @map("product_name")
-  unitPriceInCents Int      @map("unit_price_in_cents")
+  price           Int         @map("price")
   quantity         Int      @default(1)
 
   createdAt        DateTime @default(now()) @map("created_at")

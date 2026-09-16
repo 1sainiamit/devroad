@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface CartSheetProps {
   open: boolean;
@@ -15,13 +16,16 @@ interface CartSheetProps {
 }
 
 export function CartSheet({ open, onOpenChange }: CartSheetProps) {
-  const { items, updateQuantity, removeItem, cartTotal, itemCount } = useCartStore();
+  const router = useRouter();
+  const { items, updateQuantity, removeItem } = useCartStore();
+  const cartTotal = items.reduce((total, item) => total + item.product.price * item.quantity, 0);
+  const itemCount = items.reduce((total, item) => total + item.quantity, 0);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const formattedTotal = new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "USD", // Assuming USD for total, mixed currencies would require more logic
-  }).format(cartTotal / 100);
+    currency: "INR",
+  }).format(cartTotal);
 
   const handleCheckout = async () => {
     try {
@@ -46,7 +50,40 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
 
       const data = await response.json();
       if (data.url) {
-        window.location.href = data.url;
+        router.push(data.url);
+        return;
+      }
+
+      if (data.orderId) {
+        const options = {
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
+          amount: data.amount,
+          currency: data.currency,
+          name: "Devroad",
+          description: "Digital Product Purchase",
+          order_id: data.orderId,
+          handler: function () {
+            router.push(`/success?order_id=${data.orderId}`);
+          },
+          prefill: {
+            name: data.user?.name || "",
+            email: data.user?.email || "",
+          },
+          theme: {
+            color: "#000000",
+          },
+          modal: {
+            ondismiss: function() {
+              setIsCheckingOut(false);
+            }
+          }
+        };
+        const rzp = new (window as any).Razorpay(options);
+        rzp.on('payment.failed', function (){
+           toast.error("Payment failed. Please try again.");
+           setIsCheckingOut(false);
+        });
+        rzp.open();
       }
     } catch (error) {
       console.error(error);
@@ -113,7 +150,7 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
                       </button>
                     </div>
                     <div className="font-black text-lg">
-                      {new Intl.NumberFormat("en-US", { style: "currency", currency: item.product.currency || "USD" }).format(item.product.priceInCents / 100)}
+                      {new Intl.NumberFormat("en-US", { style: "currency", currency: item.product.currency || "INR" }).format(item.product.price)}
                     </div>
                   </div>
                 </div>

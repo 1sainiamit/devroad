@@ -5,7 +5,7 @@ export interface CartItem {
   product: {
     id: string;
     name: string;
-    priceInCents: number;
+    price: number;
     currency: string;
     coverImageUrl: string | null;
     creatorName: string;
@@ -65,7 +65,7 @@ export const useCartStore = create<CartStore>()(
       clearCart: () => set({ items: [] }),
       get cartTotal() {
         return get().items.reduce(
-          (total, item) => total + item.product.priceInCents * item.quantity,
+          (total, item) => total + item.product.price * item.quantity,
           0
         );
       },

@@ -36,7 +36,7 @@ export default async function AnalyticsPage() {
   const salesByProduct: Record<string, { name: string; revenue: number; sales: number }> = {};
 
   orderItems.forEach((item) => {
-    const revenue = item.unitPriceInCents * item.quantity;
+    const revenue = item.price * item.quantity;
     totalRevenue += revenue;
     totalSalesCount += item.quantity;
 
@@ -58,7 +58,7 @@ export default async function AnalyticsPage() {
     .slice(0, 10)
     .map((item) => ({
       name: item.name,
-      Revenue: item.revenue / 100, // Convert to dollars
+      Revenue: item.revenue, // Convert to rupees if needed, but it's already in rupees
       Sales: item.sales,
     }));
 
@@ -83,7 +83,7 @@ export default async function AnalyticsPage() {
             </div>
             <h3 className="font-bold text-lg">Total Revenue</h3>
           </div>
-          <p className="text-4xl font-black">${(totalRevenue / 100).toFixed(2)}</p>
+          <p className="text-4xl font-black">₹{totalRevenue}</p>
         </div>
 
         <div className="bg-yellow-300 border-4 border-black rounded-2xl p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-2px] hover:translate-x-[-2px] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all">

@@ -1,4 +1,4 @@
-import { stripe } from "@/lib/stripe";
+import { razorpay } from "@/lib/razorpay";
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/session";
 import { NextResponse } from "next/server";
@@ -32,52 +32,37 @@ export async function POST(req: Request) {
       return new NextResponse("Products not found", { status: 404 });
     }
 
-    let totalInCents = 0;
-    const orderItemsData = [];
-    const line_items = [];
-    const currency = products[0].currency.toLowerCase();
+    let total = 0;
+    const orderItemsData: {
+      productId: string;
+      productName: string;
+      price: number;
+      quantity: number;
+    }[] = [];
+    const currency = "INR"; // Switching default to INR for Razorpay
 
     for (const item of items) {
       const product = products.find((p) => p.id === item.productId);
       if (product) {
-        totalInCents += product.priceInCents * item.quantity;
+        total += product.price * item.quantity;
         
         orderItemsData.push({
           productId: product.id,
           productName: product.name,
-          unitPriceInCents: product.priceInCents,
-          quantity: item.quantity,
-        });
-
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-        const images = product.coverImageUrl 
-          ? [product.coverImageUrl.startsWith('http') ? product.coverImageUrl : `${appUrl}${product.coverImageUrl}`] 
-          : [];
-
-        line_items.push({
-          price_data: {
-            currency: product.currency.toLowerCase(),
-            product_data: {
-              name: product.name,
-              images,
-            },
-            unit_amount: product.priceInCents,
-          },
+          price: product.price,
           quantity: item.quantity,
         });
       }
     }
 
-    // If total is 0 (free products), we could bypass Stripe, but for now we'll let Stripe handle $0 checkouts or just create the order directly.
-    // Stripe actually doesn't allow $0 checkouts for one-time payments unless it's a subscription setup. 
-    // We'll handle free checkouts immediately:
-    if (totalInCents === 0) {
+    // Handle free checkouts
+    if (total === 0) {
       await prisma.order.create({
         data: {
           buyerId: user.id,
-          totalInCents,
+          total,
           currency: currency.toUpperCase(),
-          status: "PAID", // Automatically paid if free
+          status: "PAID",
           items: {
             create: orderItemsData,
           },
@@ -86,15 +71,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ url: "/success" });
     }
 
-    if (totalInCents < 50) {
-      return new NextResponse("The minimum checkout amount must be at least $0.50", { status: 400 });
+    // Minimum checkout for Razorpay in INR is 100 paise (1 INR)
+    if (total < 1) {
+      return new NextResponse("The minimum checkout amount must be at least ₹1", { status: 400 });
     }
 
     // Create a pending order in the database
     const order = await prisma.order.create({
       data: {
         buyerId: user.id,
-        totalInCents,
+        total,
         currency: currency.toUpperCase(),
         status: "PENDING",
         items: {
@@ -103,25 +89,30 @@ export async function POST(req: Request) {
       },
     });
 
-    // Create Stripe Checkout Session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items,
-      mode: "payment",
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/discover`,
-      metadata: {
-        orderId: order.id,
-      },
-    });
+    // Create Razorpay Order
+    const options = {
+      amount: total * 100, // Amount in paise for Razorpay
+      currency: currency.toUpperCase(),
+      receipt: order.id,
+    };
+    
+    const rzpOrder = await razorpay.orders.create(options);
 
-    // Update order with Stripe Session ID
+    // Update order with Razorpay Order ID
     await prisma.order.update({
       where: { id: order.id },
-      data: { stripeSessionId: session.id },
+      data: { razorpayOrderId: rzpOrder.id },
     });
 
-    return NextResponse.json({ url: session.url });
+    return NextResponse.json({ 
+      orderId: rzpOrder.id,
+      amount: rzpOrder.amount,
+      currency: rzpOrder.currency,
+      user: {
+        name: user.name || "Customer",
+        email: user.email
+      }
+    });
   } catch (error) {
     console.error("[CHECKOUT_ERROR]", error);
     return new NextResponse("Internal server error", { status: 500 });

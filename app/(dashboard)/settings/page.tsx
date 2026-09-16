@@ -65,9 +65,7 @@ export default function SettingsPage() {
             <div className="space-y-2">
               <label className="font-bold text-sm">Currency</label>
               <select className="flex h-12 w-full border-2 border-black bg-transparent px-3 py-2 text-base rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus-visible:outline-none focus-visible:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-bold cursor-pointer">
-                <option value="USD">USD ($) - United States Dollar</option>
-                <option value="EUR">EUR (€) - Euro</option>
-                <option value="GBP">GBP (£) - British Pound</option>
+                <option value="INR">INR (₹) - Indian Rupee</option>
               </select>
             </div>
           </CardContent>
