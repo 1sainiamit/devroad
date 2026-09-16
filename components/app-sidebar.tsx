@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Home, Package, ShoppingCart, BarChart3, Settings, LogOut, Compass, BookOpen, Wallet } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "./ui/button";
@@ -38,7 +39,7 @@ export function AppSidebar() {
     <Sidebar className="border-r-2 border-black bg-white">
       <SidebarHeader className="p-6 border-b-2 border-black">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-black rounded-full" />
+          <Image src="/logoicon.png" alt="Devroad Logo" width={32} height={32} className="object-contain rounded-full" />
           <Link href="/" className="font-black text-xl tracking-tighter">Devroad</Link>
         </div>
       </SidebarHeader>

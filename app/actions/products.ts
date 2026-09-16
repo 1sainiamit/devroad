@@ -44,6 +44,7 @@ type CreateProductInput = {
   description: string;
   price: string;
   currency?: string;
+  category?: string;
   status: "DRAFT" | "PUBLISHED";
 };
 
@@ -64,6 +65,7 @@ export async function createProduct(data: CreateProductInput) {
         description: data.description,
         price: parseInt(data.price, 10),
         currency: data.currency || "INR",
+        category: data.category || null,
         status: data.status,
         creatorId: user.id,
       },
@@ -88,6 +90,7 @@ type UpdateProductInput = {
   name: string;
   description: string;
   price: string;
+  category?: string;
 };
 
 export async function updateProduct(productId: string, data: UpdateProductInput) {
@@ -110,6 +113,7 @@ export async function updateProduct(productId: string, data: UpdateProductInput)
         slug: slug,
         description: data.description,
         price: parseInt(data.price, 10),
+        category: data.category || null,
       },
     });
 

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Loader2, UploadCloud, Trash2, File as FileIcon, Image as ImageIcon } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { uploadFileAction, deleteProductFileAction } from "@/app/actions/upload";
 import { updateProduct } from "@/app/actions/products";
 
@@ -66,6 +67,7 @@ export function EditorForm({ product }: { product: ProductWithFiles }) {
       name: formData.get("name") as string,
       price: formData.get("price") as string,
       description: formData.get("description") as string,
+      category: formData.get("category") as string || "",
     };
 
     startTransition(async () => {
@@ -252,6 +254,23 @@ export function EditorForm({ product }: { product: ProductWithFiles }) {
                 disabled={isPending}
                 className="border-2 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus-visible:ring-0 focus-visible:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-medium min-h-[150px]"
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="category" className="font-bold text-base">Category</Label>
+              <Select name="category" defaultValue={product.category || ""} disabled={isPending}>
+                <SelectTrigger className="h-12 border-2 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:ring-0 focus-visible:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-bold">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent className="border-2 border-black rounded-none font-bold">
+                  <SelectItem value="Self Improvement">Self Improvement</SelectItem>
+                  <SelectItem value="Education">Education</SelectItem>
+                  <SelectItem value="Business & Money">Business & Money</SelectItem>
+                  <SelectItem value="Drawing & Painting">Drawing & Painting</SelectItem>
+                  <SelectItem value="Software Development">Software Development</SelectItem>
+                  <SelectItem value="Design">Design</SelectItem>
+                  <SelectItem value="Other">Other</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex justify-end pt-4 border-t-2 border-black/10">
               <Button

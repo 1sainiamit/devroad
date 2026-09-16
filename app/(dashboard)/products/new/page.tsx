@@ -22,6 +22,7 @@ const ProductSchema = z.object({
     return !isNaN(num) && num >= 0;
   }, "Invalid price amount"),
   currency: z.string().optional(),
+  category: z.string().optional(),
   status: z.enum(["DRAFT", "PUBLISHED"]),
 });
 
@@ -38,6 +39,7 @@ export default function NewProduct() {
       description: formData.get("description") as string,
       price: formData.get("price") as string,
       currency: formData.get("currency") as string || "INR",
+      category: formData.get("category") as string || "",
       status: formData.get("status") as "DRAFT" | "PUBLISHED",
     };
 
@@ -177,17 +179,37 @@ export default function NewProduct() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="status" className="font-bold text-base">Initial Status</Label>
-              <Select name="status" defaultValue="DRAFT" disabled={isPending}>
-                <SelectTrigger className="h-14 border-2 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:ring-0 focus-visible:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-lg font-bold">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="border-2 border-black rounded-none font-bold">
-                  <SelectItem value="DRAFT">Draft (Hidden)</SelectItem>
-                  <SelectItem value="PUBLISHED">Published (Live)</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="grid sm:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="category" className="font-bold text-base">Category</Label>
+                <Select name="category" defaultValue="" disabled={isPending}>
+                  <SelectTrigger className="h-14 border-2 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:ring-0 focus-visible:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-lg font-bold">
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent className="border-2 border-black rounded-none font-bold">
+                    <SelectItem value="Self Improvement">Self Improvement</SelectItem>
+                    <SelectItem value="Education">Education</SelectItem>
+                    <SelectItem value="Business & Money">Business & Money</SelectItem>
+                    <SelectItem value="Drawing & Painting">Drawing & Painting</SelectItem>
+                    <SelectItem value="Software Development">Software Development</SelectItem>
+                    <SelectItem value="Design">Design</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="status" className="font-bold text-base">Initial Status</Label>
+                <Select name="status" defaultValue="DRAFT" disabled={isPending}>
+                  <SelectTrigger className="h-14 border-2 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:ring-0 focus-visible:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-lg font-bold">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="border-2 border-black rounded-none font-bold">
+                    <SelectItem value="DRAFT">Draft (Hidden)</SelectItem>
+                    <SelectItem value="PUBLISHED">Published (Live)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Star, Palette, Zap, Sparkles } from "lucide-react";
 
 export default function Home() {
@@ -92,20 +93,6 @@ export default function Home() {
         </Button>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-white py-12 px-6 md:px-12">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-black rounded-full" />
-            <span className="font-bold text-xl tracking-tighter">Devroad</span>
-          </div>
-          <div className="flex gap-6 font-bold text-sm md:text-base">
-            <Link href="#" className="hover:underline decoration-2 underline-offset-4">Help</Link>
-            <Link href="#" className="hover:underline decoration-2 underline-offset-4">Terms</Link>
-            <Link href="#" className="hover:underline decoration-2 underline-offset-4">Privacy</Link>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

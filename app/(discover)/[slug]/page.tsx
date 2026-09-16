@@ -3,7 +3,7 @@ import Image from "next/image";
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/session";
 import { BuyButton } from "@/components/storefront/buy-button";
-import { User, ShieldCheck } from "lucide-react";
+import { User, ShieldCheck, Star } from "lucide-react";
 import Link from "next/link";
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -21,6 +21,19 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           avatarUrl: true,
         },
       },
+      reviews: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              username: true,
+              avatarUrl: true,
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      },
     },
   });
 
@@ -31,6 +44,14 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   // Only allow viewing if published, or if the current user is the creator
   if (product.status !== "PUBLISHED" && product.creator.id !== user?.id) {
     notFound();
+  }
+
+  // Increment view count — skip if the creator is viewing their own product
+  if (product.status === "PUBLISHED" && product.creator.id !== user?.id) {
+    await prisma.product.update({
+      where: { id: product.id },
+      data: { viewCount: { increment: 1 } },
+    });
   }
 
   // Check if user has purchased this product
@@ -55,22 +76,21 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     <div className="max-w-6xl mx-auto px-6 py-12 text-white">
       <div className="flex flex-col lg:flex-row gap-12 lg:gap-16">
 
-        {/* Left Column: Image and Description */}
+        {/* Left Column: Image, Description, and Reviews */}
         <div className="flex-1 space-y-8">
-          <div className="aspect-[4/3] md:aspect-video lg:aspect-[4/3] w-full bg-[#f4f4f0] rounded-lg relative overflow-hidden flex items-center justify-center p-8">
+          {/* Full-Width Image Container */}
+          <div className="aspect-[16/10] w-full bg-[#f4f4f0] rounded-lg relative overflow-hidden flex-shrink-0">
             {product.coverImageUrl ? (
-              <div className="relative w-full h-full shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
-                <Image
-                  src={product.coverImageUrl}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  priority
-                />
-              </div>
+              <Image
+                src={product.coverImageUrl}
+                alt={product.name}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority
+              />
             ) : (
-              <div className="text-black/40 font-medium text-xl">
+              <div className="w-full h-full flex items-center justify-center text-black/40 font-medium text-xl border border-black/10">
                 No cover image
               </div>
             )}
@@ -84,6 +104,87 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               </div>
             ) : (
               <p className="text-white/50 italic">No description provided.</p>
+            )}
+          </div>
+
+          {/* Reviews Section */}
+          <div className="pt-4 border-t border-white/10">
+            <div className="flex items-center gap-3 mb-6">
+              <h2 className="text-3xl font-medium">Reviews</h2>
+              {product.reviewCount > 0 && (
+                <div className="flex items-center gap-2 text-white/60">
+                  <Star className="w-5 h-5 fill-white text-white" />
+                  <span className="text-lg font-medium text-white">
+                    {product.averageRating.toFixed(1)}
+                  </span>
+                  <span className="text-base">
+                    ({product.reviewCount} {product.reviewCount === 1 ? "review" : "reviews"})
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {product.reviews.length === 0 ? (
+              <p className="text-white/50 italic">No reviews yet. Be the first to review this product!</p>
+            ) : (
+              <div className="space-y-6">
+                {product.reviews.map((review) => {
+                  const reviewerName = review.user.name || review.user.username || "Anonymous";
+                  return (
+                    <div
+                      key={review.id}
+                      className="p-5 rounded-lg bg-white/5 border border-white/10"
+                    >
+                      <div className="flex items-start gap-3">
+                        {review.user.avatarUrl ? (
+                          <Image
+                            src={review.user.avatarUrl}
+                            alt={reviewerName}
+                            width={36}
+                            height={36}
+                            className="rounded-full border border-white/20 flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center border border-white/20 flex-shrink-0">
+                            <User className="w-4 h-4 text-white/60" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2 mb-1">
+                            <span className="font-medium text-white truncate">
+                              {reviewerName}
+                            </span>
+                            <span className="text-sm text-white/40 flex-shrink-0">
+                              {new Date(review.createdAt).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-0.5 mb-3">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`w-4 h-4 ${
+                                  star <= review.rating
+                                    ? "fill-white text-white"
+                                    : "fill-transparent text-white/20"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          {review.comment && (
+                            <p className="text-white/70 leading-relaxed whitespace-pre-wrap">
+                              {review.comment}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
         </div>

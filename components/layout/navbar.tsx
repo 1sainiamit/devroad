@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -11,7 +12,7 @@ export function Navbar() {
     <nav className="flex items-center justify-between px-6 md:px-12 py-4 border-b-2 border-black bg-white sticky top-0 z-50">
       <div className="flex items-center gap-2">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-black rounded-full" />
+          <Image src="/logoicon.png" alt="Devroad Logo" width={32} height={32} className="object-contain rounded-full" />
           <span className="font-bold text-2xl tracking-tighter">Devroad</span>
         </Link>
       </div>

@@ -5,9 +5,9 @@ import { getCurrentUser } from "@/lib/session";
 export default async function DiscoverPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; category?: string }>;
 }) {
-  const { q } = await searchParams;
+  const { q, category } = await searchParams;
   const query = q || "";
   const user = await getCurrentUser();
 
@@ -22,6 +22,9 @@ export default async function DiscoverPage({
               { creator: { name: { contains: query, mode: "insensitive" } } },
             ],
           }
+        : {}),
+      ...(category
+        ? { category: { equals: category, mode: "insensitive" } }
         : {}),
     },
     include: {
@@ -69,7 +72,7 @@ export default async function DiscoverPage({
       <section className="max-w-7xl mx-auto px-6 py-16">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-black tracking-tight text-white">
-            {query ? `Search results for "${query}"` : "Trending Products"}
+            {query ? `Search results for "${query}"` : category ? `${category} Products` : "Trending Products"}
           </h2>
           <div className="text-white/70 font-medium">
             {products.length} {products.length === 1 ? "product" : "products"}
@@ -83,8 +86,8 @@ export default async function DiscoverPage({
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {productsWithStatus.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {productsWithStatus.map((product, index) => (
+              <ProductCard key={product.id} product={product} priority={index === 0} />
             ))}
           </div>
         )}

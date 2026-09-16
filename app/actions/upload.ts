@@ -2,10 +2,31 @@
 
 import { getCurrentUser } from "@/lib/session";
 import prisma from "@/lib/prisma";
-import fs from "fs/promises";
-import path from "path";
-import crypto from "crypto";
 import { revalidatePath } from "next/cache";
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
+
+// Cloudinary config is automatically picked up from CLOUDINARY_URL in .env
+
+const uploadToCloudinary = (buffer: Buffer, resourceType: "image" | "raw", originalFilename: string): Promise<UploadApiResponse> => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { 
+        resource_type: resourceType,
+        folder: "devroad",
+        use_filename: true,
+        unique_filename: true,
+        // Fallback filename for raw files
+        public_id: originalFilename.replace(/\.[^/.]+$/, "") 
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        if (!result) return reject(new Error("Upload failed, no result returned"));
+        resolve(result);
+      }
+    );
+    uploadStream.end(buffer);
+  });
+};
 
 export async function uploadFileAction(formData: FormData) {
   try {
@@ -31,23 +52,15 @@ export async function uploadFileAction(formData: FormData) {
       return { success: false, message: "Unauthorized to edit this product" };
     }
 
-    // Generate a unique filename to prevent overwriting
-    const uniqueId = crypto.randomBytes(8).toString("hex");
-    const originalExtension = path.extname(file.name);
-    const fileName = `${uniqueId}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`;
-    
     // Convert the file to a Node.js Buffer
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    // Write the file to the local public/uploads directory
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    const filePath = path.join(uploadDir, fileName);
+    // Upload to Cloudinary
+    const cloudinaryResourceType = uploadType === "COVER" ? "image" : "raw";
+    const uploadResult = await uploadToCloudinary(buffer, cloudinaryResourceType, file.name);
     
-    // Ensure the directory exists (just in case)
-    await fs.mkdir(uploadDir, { recursive: true });
-    await fs.writeFile(filePath, buffer);
-
-    const fileUrl = `/uploads/${fileName}`;
+    const fileUrl = uploadResult.secure_url;
+    const storageKey = uploadResult.public_id; // Save public_id to delete it later
 
     if (uploadType === "COVER") {
       // Update the Product's cover image
@@ -61,7 +74,7 @@ export async function uploadFileAction(formData: FormData) {
         data: {
           productId,
           name: file.name,
-          storageKey: fileUrl, // In local dev, the key is just the URL path
+          storageKey: storageKey, // Cloudinary public_id
           sizeInBytes: file.size,
           contentType: file.type,
         },
@@ -83,6 +96,48 @@ export async function uploadFileAction(formData: FormData) {
   }
 }
 
+export async function updateProfileAction(formData: FormData) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { success: false, message: "Unauthorized" };
+
+    const name = (formData.get("name") as string)?.trim() || null;
+    const bio = (formData.get("bio") as string)?.trim() || null;
+    const avatarFile = formData.get("avatar") as File | null;
+
+    let avatarUrl: string | undefined = undefined;
+
+    if (avatarFile && avatarFile.size > 0) {
+      if (!avatarFile.type.startsWith("image/")) {
+        return { success: false, message: "Avatar must be an image file." };
+      }
+      if (avatarFile.size > 5 * 1024 * 1024) {
+        return { success: false, message: "Avatar must be under 5 MB." };
+      }
+      const buffer = Buffer.from(await avatarFile.arrayBuffer());
+      const result = await uploadToCloudinary(buffer, "image", `avatar_${user.id}`);
+      avatarUrl = result.secure_url;
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        name,
+        bio,
+        ...(avatarUrl ? { avatarUrl } : {}),
+      },
+    });
+
+    revalidatePath("/settings");
+    revalidatePath("/dashboard");
+
+    return { success: true, message: "Profile updated successfully." };
+  } catch (error) {
+    console.error("Profile update error:", error);
+    return { success: false, message: "Failed to update profile." };
+  }
+}
+
 export async function deleteProductFileAction(fileId: string, productId: string) {
   try {
     const user = await getCurrentUser();
@@ -101,9 +156,8 @@ export async function deleteProductFileAction(fileId: string, productId: string)
     // Delete the record from DB
     await prisma.productFile.delete({ where: { id: fileId } });
 
-    // Optional: Delete the physical file from disk
-    // const filePath = path.join(process.cwd(), "public", file.storageKey);
-    // await fs.unlink(filePath).catch(() => {});
+    // Delete the physical file from Cloudinary
+    await cloudinary.uploader.destroy(file.storageKey, { resource_type: "raw" });
 
     revalidatePath(`/products/${productId}/edit`);
     return { success: true, message: "File deleted" };
@@ -111,3 +165,4 @@ export async function deleteProductFileAction(fileId: string, productId: string)
     return { success: false, message: "Error deleting file" };
   }
 }
+

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { FileList } from "@/components/library/file-list";
+import { RatingWidget } from "@/components/library/rating-widget";
 
 export default async function ProductDownloadPage({ params }: { params: Promise<{ productId: string }> }) {
   const { productId } = await params;
@@ -47,6 +48,16 @@ export default async function ProductDownloadPage({ params }: { params: Promise<
     notFound();
   }
 
+  // Fetch the user's existing review if any
+  const existingReview = await prisma.review.findUnique({
+    where: {
+      userId_productId: {
+        userId: user.id,
+        productId: productId
+      }
+    }
+  });
+
   const creatorName = product.creator.name || product.creator.username || "Anonymous";
 
   return (
@@ -87,6 +98,14 @@ export default async function ProductDownloadPage({ params }: { params: Promise<
               ...f,
               sizeInBytes: Number(f.sizeInBytes)
             }))} />
+          </div>
+
+          <div className="mt-12">
+            <RatingWidget 
+              productId={productId} 
+              initialRating={existingReview?.rating} 
+              initialComment={existingReview?.comment} 
+            />
           </div>
         </div>
       </div>

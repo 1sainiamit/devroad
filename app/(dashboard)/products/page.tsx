@@ -42,33 +42,40 @@ export default async function ProductsPage() {
           </Button>
         </Card>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.data?.map((product) => (
-            <Link key={product.id} href={`/products/${product.id}/edit`}>
-              <Card className="flex items-center p-4 gap-4 bg-white hover:bg-accent/50 transition-colors cursor-pointer group">
-                <div className="w-16 h-16 bg-muted border-2 border-black rounded-sm flex items-center justify-center shrink-0 overflow-hidden relative">
+            <Link key={product.id} href={`/products/${product.id}/edit`} className="group block">
+              <Card className="h-full flex flex-col border-2 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all bg-white overflow-hidden cursor-pointer">
+                {/* Image Section */}
+                <div className="aspect-[16/10] bg-[#f4f4f0] border-b-2 border-black relative overflow-hidden">
                   {product.coverImageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={product.coverImageUrl} alt={product.name} className="w-full h-full object-cover" />
+                    <img src={product.coverImageUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                   ) : (
-                    <FileText className="w-6 h-6 text-muted-foreground" />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-lg truncate group-hover:underline">{product.name}</h3>
-                  <p className="text-sm font-medium text-muted-foreground">{product.description || "Digital Download"}</p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <div className="font-black text-lg">₹{product.price}</div>
-                    <div className={`text-xs font-bold px-2 py-0.5 rounded-full inline-block mt-1 ${product.status === "PUBLISHED" ? "text-green-600 bg-green-100" : "text-amber-600 bg-amber-100"
-                      }`}>
-                      {product.status}
+                    <div className="w-full h-full flex items-center justify-center">
+                      <FileText className="w-10 h-10 text-black/20" />
                     </div>
+                  )}
+                  {/* Status Badge */}
+                  <div className={`absolute top-3 right-3 text-xs font-bold px-3 py-1 rounded-none border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${product.status === "PUBLISHED" ? "bg-[#bbf7d0] text-black" : "bg-[#fde047] text-black"}`}>
+                    {product.status}
                   </div>
-                  <Button variant="ghost" size="icon" className="hover:bg-black hover:text-white rounded-full">
-                    <MoreHorizontal className="w-5 h-5" />
-                  </Button>
+                </div>
+                
+                {/* Content Section */}
+                <div className="p-5 flex flex-col flex-grow">
+                  <div className="flex justify-between items-start mb-2 gap-4">
+                    <h3 className="font-black text-xl line-clamp-1 group-hover:underline">{product.name}</h3>
+                    <div className="font-black text-xl shrink-0">₹{product.price}</div>
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground line-clamp-2 mb-4">
+                    {product.description || "Digital Download"}
+                  </p>
+                  
+                  {/* Footer / Actions */}
+                  <div className="mt-auto pt-4 border-t-2 border-black/10 flex justify-between items-center text-sm font-bold text-black/60 group-hover:text-black transition-colors">
+                    <span className="flex items-center gap-1.5"><MoreHorizontal className="w-4 h-4"/> Manage Product</span>
+                  </div>
                 </div>
               </Card>
             </Link>

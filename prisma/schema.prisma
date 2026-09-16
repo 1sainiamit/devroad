@@ -36,6 +36,7 @@ model User {
 
   products       Product[]
   orders         Order[]
+  reviews        Review[]
 
   @@map("users")
 }
@@ -74,6 +75,11 @@ model Product {
 
   price         Int
   currency      String        @default("INR")
+  category      String?
+
+  averageRating Float         @default(0) @map("average_rating")
+  reviewCount   Int           @default(0) @map("review_count")
+  viewCount     Int           @default(0) @map("view_count")
 
   status        ProductStatus @default(DRAFT)
 
@@ -84,6 +90,7 @@ model Product {
   creator       User          @relation(fields: [creatorId], references: [id])
   files         ProductFile[]
   orderItems    OrderItem[]
+  reviews       Review[]
 
   @@unique([creatorId, slug])
   @@index([creatorId])
@@ -151,4 +158,23 @@ model OrderItem {
   @@index([orderId])
   @@index([productId])
   @@map("order_items")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String?
+  
+  userId    String   @map("user_id")
+  productId String   @map("product_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@index([productId])
+  @@map("reviews")
 }
