@@ -53,6 +53,7 @@ export async function loginAction(
 
     await createSession(user.id);
   } catch (error) {
+    console.error("Login Action Error:", error);
     return {
       errors: { _form: ["An unexpected error occurred."] },
     };
@@ -135,6 +136,7 @@ export async function sendSignupOtpAction(
       step: "otp",
     };
   } catch (error) {
+    console.error("Signup Action Error:", error);
     return {
       errors: { _form: ["An unexpected error occurred."] },
       step: "email",
