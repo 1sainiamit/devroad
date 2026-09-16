@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import prisma from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/session";
 import { redirect } from "next/navigation";
+import { ReceiptButton } from "@/components/sales/receipt-button";
 
 export default async function SalesPage() {
   const user = await getCurrentUser();
@@ -38,6 +39,11 @@ export default async function SalesPage() {
       currency: 'INR'
     }).format(amountInRupees);
 
+    const formattedUnitPrice = new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR'
+    }).format(item.price);
+
     const formattedDate = new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
@@ -46,11 +52,19 @@ export default async function SalesPage() {
 
     return {
       id: item.id,
-      customer: item.order.buyer.email,
+      orderId: item.orderId,
+      customerName: item.order.buyer.name || "Customer",
+      customerEmail: item.order.buyer.email,
       product: item.productName,
+      quantity: item.quantity.toString(),
+      unitPrice: formattedUnitPrice,
       date: formattedDate,
       amount: formattedAmount,
-      status: item.order.status
+      numericAmount: amountInRupees,
+      status: item.order.status,
+      paymentId: item.order.razorpayPaymentId,
+      creatorName: user.name || "Creator",
+      creatorEmail: user.email
     };
   });
 
@@ -86,12 +100,13 @@ export default async function SalesPage() {
                   <TableHead className="font-bold text-black h-12">Date</TableHead>
                   <TableHead className="font-bold text-black h-12 text-right">Amount</TableHead>
                   <TableHead className="font-bold text-black h-12 text-right px-4">Status</TableHead>
+                  <TableHead className="font-bold text-black h-12 text-right px-4">Receipt</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sales.map((sale) => (
                   <TableRow key={sale.id} className="border-b border-black/10 hover:bg-accent/50 cursor-pointer">
-                    <TableCell className="font-medium px-4 py-4">{sale.customer}</TableCell>
+                    <TableCell className="font-medium px-4 py-4">{sale.customerEmail}</TableCell>
                     <TableCell className="font-bold">{sale.product}</TableCell>
                     <TableCell className="text-muted-foreground">{sale.date}</TableCell>
                     <TableCell className="text-right font-black">{sale.amount}</TableCell>
@@ -104,6 +119,9 @@ export default async function SalesPage() {
                       }`}>
                         {sale.status === 'PAID' ? 'Paid' : sale.status === 'REFUNDED' ? 'Refunded' : sale.status === 'PENDING' ? 'Pending' : 'Failed'}
                       </span>
+                    </TableCell>
+                    <TableCell className="text-right px-4">
+                      <ReceiptButton sale={sale} />
                     </TableCell>
                   </TableRow>
                 ))}

@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { ProductCard } from "@/components/products/product-card";
+import { getCurrentUser } from "@/lib/session";
 
 export default async function DiscoverPage({
   searchParams,
@@ -8,6 +9,7 @@ export default async function DiscoverPage({
 }) {
   const { q } = await searchParams;
   const query = q || "";
+  const user = await getCurrentUser();
 
   const products = await prisma.product.findMany({
     where: {
@@ -25,15 +27,39 @@ export default async function DiscoverPage({
     include: {
       creator: {
         select: {
+          id: true,
           name: true,
           username: true,
           avatarUrl: true,
         },
       },
+      ...(user ? {
+        orderItems: {
+          where: {
+            order: {
+              buyerId: user.id,
+              status: "PAID"
+            }
+          },
+          select: { id: true }
+        }
+      } : {})
     },
     orderBy: {
       createdAt: "desc",
     },
+  });
+
+  const productsWithStatus = products.map(product => {
+    const isCreator = user ? product.creator.id === user.id : false;
+    // @ts-ignore - orderItems is conditionally included
+    const isOwned = user ? product.orderItems && product.orderItems.length > 0 : false;
+    
+    return {
+      ...product,
+      isCreator,
+      isOwned
+    };
   });
 
   return (
@@ -57,7 +83,7 @@ export default async function DiscoverPage({
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {products.map((product) => (
+            {productsWithStatus.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

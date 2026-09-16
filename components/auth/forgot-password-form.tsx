@@ -1,21 +1,20 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { sendSignupOtpAction, verifySignupOtpAction } from "@/app/actions/auth";
+import { sendForgotPasswordOtpAction, resetPasswordAction } from "@/app/actions/auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldError, FieldGroup, FieldContent } from "@/components/ui/field";
-import { Loader2, Mail, Lock, User, Key, Eye, EyeOff } from "lucide-react";
+import { Loader2, Mail, Lock, Key, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 
-export function SignupForm() {  
+export function ForgotPasswordForm() {  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   
-  const [sendState, sendAction, isSending] = useActionState(sendSignupOtpAction, undefined);
-  const [verifyState, verifyAction, isVerifying] = useActionState(verifySignupOtpAction, undefined);
+  const [sendState, sendAction, isSending] = useActionState(sendForgotPasswordOtpAction, undefined);
+  const [resetState, resetAction, isResetting] = useActionState(resetPasswordAction, undefined);
 
   const step = sendState?.step === "otp" ? "otp" : "email";
 
@@ -26,34 +25,16 @@ export function SignupForm() {
       
       <div className="text-center mb-10">
         <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent mb-3">
-          {step === "email" ? "Create an account" : "Verify your email"}
+          {step === "email" ? "Forgot Password" : "Reset Password"}
         </h1>
         <p className="text-muted-foreground text-sm font-medium">
-          {step === "email" ? "Start selling your digital products today" : `We sent a 6-digit code to ${email}`}
+          {step === "email" ? "Enter your email to receive a reset code" : `We sent a 6-digit code to ${email}`}
         </p>
       </div>
 
       {step === "email" && (
         <form action={sendAction} className="space-y-6">
           <FieldGroup>
-            <Field data-invalid={!!sendState?.errors?.name}>
-              <FieldLabel htmlFor="name">Name (Optional)</FieldLabel>
-              <FieldContent className="relative">
-                <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground/60" />
-                <Input
-                  id="name"
-                  name="name"
-                  type="text"
-                  placeholder="Jane Doe"
-                  className="pl-10 bg-background/50 border-white/10 focus-visible:ring-primary/30 h-11 transition-all duration-300"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  disabled={isSending}
-                />
-              </FieldContent>
-              {sendState?.errors?.name && <FieldError>{sendState.errors.name[0]}</FieldError>}
-            </Field>
-
             <Field data-invalid={!!sendState?.errors?.email}>
               <FieldLabel htmlFor="email">Email</FieldLabel>
               <FieldContent className="relative">
@@ -72,39 +53,18 @@ export function SignupForm() {
               </FieldContent>
               {sendState?.errors?.email && <FieldError>{sendState.errors.email[0]}</FieldError>}
             </Field>
-
-            <Field data-invalid={!!sendState?.errors?.password}>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
-              <FieldContent className="relative">
-                <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground/60" />
-                <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  placeholder="••••••••"
-                  className="pl-10 pr-10 bg-background/50 border-white/10 focus-visible:ring-primary/30 h-11 transition-all duration-300"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={isSending}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-muted-foreground/60 hover:text-foreground transition-colors focus:outline-none"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </FieldContent>
-              {sendState?.errors?.password && <FieldError>{sendState.errors.password[0]}</FieldError>}
-            </Field>
           </FieldGroup>
 
           {sendState?.errors?._form && (
             <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium animate-in fade-in slide-in-from-top-1">
               {sendState.errors._form[0]}
             </div>
+          )}
+
+          {sendState?.message && (
+             <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400 text-sm font-medium animate-in fade-in slide-in-from-top-1">
+               {sendState.message}
+             </div>
           )}
 
           <Button
@@ -118,13 +78,13 @@ export function SignupForm() {
                 Sending code...
               </>
             ) : (
-              "Continue with Email"
+              "Send Reset Code"
             )}
           </Button>
           
           <div className="text-center mt-6">
             <p className="text-sm font-medium text-muted-foreground">
-              Already have an account?{" "}
+              Remember your password?{" "}
               <Link href="/login" className="text-primary hover:underline transition-all">
                 Sign in
               </Link>
@@ -134,14 +94,12 @@ export function SignupForm() {
       )}
 
       {step === "otp" && (
-        <form action={verifyAction} className="space-y-6">
+        <form action={resetAction} className="space-y-6">
           <input type="hidden" name="email" value={email} />
-          <input type="hidden" name="name" value={name} />
-          <input type="hidden" name="password" value={password} />
 
           <FieldGroup>
-            <Field data-invalid={!!verifyState?.errors?.otp}>
-              <FieldLabel htmlFor="otp">Verification Code</FieldLabel>
+            <Field data-invalid={!!resetState?.errors?.otp}>
+              <FieldLabel htmlFor="otp">Reset Code</FieldLabel>
               <FieldContent className="relative">
                 <Key className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground/60" />
                 <Input
@@ -152,31 +110,58 @@ export function SignupForm() {
                   maxLength={6}
                   placeholder="123456"
                   className="pl-10 bg-background/50 border-white/10 focus-visible:ring-primary/30 h-11 transition-all duration-300 text-center text-lg tracking-widest"
-                  disabled={isVerifying}
+                  disabled={isResetting}
                 />
               </FieldContent>
-              {verifyState?.errors?.otp && <FieldError>{verifyState.errors.otp[0]}</FieldError>}
+              {resetState?.errors?.otp && <FieldError>{resetState.errors.otp[0]}</FieldError>}
+            </Field>
+
+            <Field data-invalid={!!resetState?.errors?.password}>
+              <FieldLabel htmlFor="password">New Password</FieldLabel>
+              <FieldContent className="relative">
+                <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground/60" />
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  placeholder="••••••••"
+                  className="pl-10 pr-10 bg-background/50 border-white/10 focus-visible:ring-primary/30 h-11 transition-all duration-300"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isResetting}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-2.5 text-muted-foreground/60 hover:text-foreground transition-colors focus:outline-none"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </FieldContent>
+              {resetState?.errors?.password && <FieldError>{resetState.errors.password[0]}</FieldError>}
             </Field>
           </FieldGroup>
 
-          {verifyState?.errors?._form && (
+          {resetState?.errors?._form && (
             <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium animate-in fade-in slide-in-from-top-1">
-              {verifyState.errors._form[0]}
+              {resetState.errors._form[0]}
             </div>
           )}
 
           <Button
             type="submit"
             className="w-full h-12 rounded-xl text-base font-semibold transition-all duration-300 hover:scale-[1.02] active:scale-95 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25"
-            disabled={isVerifying}
+            disabled={isResetting}
           >
-            {isVerifying ? (
+            {isResetting ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Verifying...
+                Resetting...
               </>
             ) : (
-              "Verify Code & Create Account"
+              "Reset Password"
             )}
           </Button>
         </form>

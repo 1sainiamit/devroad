@@ -14,6 +14,8 @@ interface ProductCardProps {
       username: string | null;
       avatarUrl: string | null;
     };
+    isCreator?: boolean;
+    isOwned?: boolean;
   };
 }
 
@@ -90,13 +92,27 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="border-t border-[#333]" />
 
       {/* Price Row */}
-      <div className="p-5 bg-black">
-        <div 
-          className="inline-block bg-[#ff90e8] text-black font-medium text-xl px-5 py-2"
-          style={{ clipPath: "polygon(0% 0%, 100% 0%, 75% 50%, 100% 100%, 0% 100%)" }}
-        >
-          {product.price === 0 ? "Free+" : `${formattedPrice}+`}
-        </div>
+      <div className="p-5 bg-black flex justify-between items-center">
+        {product.isCreator ? (
+          <div 
+            className="inline-block bg-white text-black font-bold text-lg px-4 py-1.5 border-2 border-black shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
+          >
+            Your Product
+          </div>
+        ) : product.isOwned ? (
+          <div 
+            className="inline-block bg-green-400 text-black font-bold text-lg px-4 py-1.5 border-2 border-green-400"
+          >
+            Purchased
+          </div>
+        ) : (
+          <div 
+            className="inline-block bg-[#ff90e8] text-black font-medium text-xl px-5 py-2"
+            style={{ clipPath: "polygon(0% 0%, 100% 0%, 75% 50%, 100% 100%, 0% 100%)" }}
+          >
+            {product.price === 0 ? "Free+" : `${formattedPrice}+`}
+          </div>
+        )}
       </div>
     </Link>
   );

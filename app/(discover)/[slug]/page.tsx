@@ -33,6 +33,22 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     notFound();
   }
 
+  // Check if user has purchased this product
+  let isOwned = false;
+  if (user) {
+    const orderItem = await prisma.orderItem.findFirst({
+      where: {
+        productId: product.id,
+        order: {
+          buyerId: user.id,
+          status: "PAID"
+        }
+      }
+    });
+    isOwned = !!orderItem;
+  }
+
+  const isCreator = product.creator.id === user?.id;
   const creatorName = product.creator.name || product.creator.username || "Anonymous";
 
   return (
@@ -99,17 +115,31 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             </Link>
 
             <div className="space-y-4 pt-2">
-              <BuyButton
-                product={{
-                  id: product.id,
-                  name: product.name,
-                  price: product.price,
-                  currency: product.currency,
-                  coverImageUrl: product.coverImageUrl,
-                  creatorName: creatorName,
-                  slug: product.slug,
-                }}
-              />
+              {isCreator ? (
+                <Link href={`/dashboard/products/${product.id}`} className="block w-full">
+                  <div className="w-full h-14 flex items-center justify-center text-lg font-bold bg-white text-black hover:bg-gray-200 transition-colors border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                    Edit Product
+                  </div>
+                </Link>
+              ) : isOwned ? (
+                <Link href={`/library`} className="block w-full">
+                  <div className="w-full h-14 flex items-center justify-center text-lg font-bold bg-green-400 text-black hover:bg-green-500 transition-colors border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:-translate-x-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                    View Content
+                  </div>
+                </Link>
+              ) : (
+                <BuyButton
+                  product={{
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    currency: product.currency,
+                    coverImageUrl: product.coverImageUrl,
+                    creatorName: creatorName,
+                    slug: product.slug,
+                  }}
+                />
+              )}
 
               <div className="flex items-center justify-center gap-2 text-sm font-medium text-white/60 pt-4">
                 <ShieldCheck className="w-4 h-4 text-white/60" />

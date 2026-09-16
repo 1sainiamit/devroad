@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useTransition, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -9,13 +9,14 @@ import { loginAction } from "@/app/actions/auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel, FieldError, FieldGroup, FieldContent } from "@/components/ui/field";
-import { Loader2, Mail, Lock } from "lucide-react";
+import { Loader2, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const [isPending, startTransition] = useTransition();
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -86,17 +87,25 @@ export function LoginForm() {
 
           <Field data-invalid={!!errors.password}>
             <FieldLabel htmlFor="password">Password</FieldLabel>
-            <FieldContent className="relative">
-              <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground/60" />
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                className="pl-10 bg-background/50 border-white/10 focus-visible:ring-primary/30 h-11 transition-all duration-300"
-                {...register("password")}
-                disabled={isPending}
-              />
-            </FieldContent>
+              <FieldContent className="relative">
+                <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground/60" />
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  className="pl-10 pr-10 bg-background/50 border-white/10 focus-visible:ring-primary/30 h-11 transition-all duration-300"
+                  {...register("password")}
+                  disabled={isPending}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-2.5 text-muted-foreground/60 hover:text-foreground transition-colors focus:outline-none"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </FieldContent>
             {errors.password && <FieldError>{errors.password.message}</FieldError>}
           </Field>
         </FieldGroup>
@@ -123,9 +132,9 @@ export function LoginForm() {
         </Button>
         
         <div className="flex flex-col items-center mt-6 space-y-4">
-          <a href="#" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+          <Link href="/forgot-password" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
             Forgot your password?
-          </a>
+          </Link>
           <p className="text-sm font-medium text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link href="/signup" className="text-primary hover:underline transition-all">
