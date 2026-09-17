@@ -9,6 +9,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { loadRazorpay } from "@/lib/load-razorpay";
 
 interface CartSheetProps {
   open: boolean;
@@ -55,6 +56,13 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
       }
 
       if (data.orderId) {
+        const isLoaded = await loadRazorpay();
+        if (!isLoaded) {
+          toast.error("Razorpay SDK failed to load. Are you online?");
+          setIsCheckingOut(false);
+          return;
+        }
+
         const options = {
           key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
           amount: data.amount,
@@ -78,7 +86,7 @@ export function CartSheet({ open, onOpenChange }: CartSheetProps) {
             }
           }
         };
-        const rzp = new (window as any).Razorpay(options);
+        const rzp = new window.Razorpay(options as Record<string, unknown>);
         rzp.on('payment.failed', function (){
            toast.error("Payment failed. Please try again.");
            setIsCheckingOut(false);

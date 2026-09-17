@@ -48,16 +48,16 @@ export function Footer() {
             © {new Date().getFullYear()} Devroad. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <a href="https://x.com/isainiamit" target="_blank" rel="noreferrer" className="text-gray-600 hover:text-black hover:-translate-y-1 transition-transform">
+            <a href="https://x.com/isainiamit" target="_blank" rel="noreferrer" aria-label="X (Twitter)" className="text-gray-600 hover:text-black hover:-translate-y-1 transition-transform">
               <Icons.x className="w-6 h-6" />
             </a>
-            <a href="https://www.instagram.com/_sainiamit" target="_blank" rel="noreferrer" className="text-gray-600 hover:text-black hover:-translate-y-1 transition-transform">
+            <a href="https://www.instagram.com/_sainiamit" target="_blank" rel="noreferrer" aria-label="Instagram" className="text-gray-600 hover:text-black hover:-translate-y-1 transition-transform">
               <Icons.instagram className="w-6 h-6" />
             </a>
-            <a href="https://in.pinterest.com/isainiamit/" target="_blank" rel="noreferrer" className="text-gray-600 hover:text-black hover:-translate-y-1 transition-transform">
+            <a href="https://in.pinterest.com/isainiamit/" target="_blank" rel="noreferrer" aria-label="Pinterest" className="text-gray-600 hover:text-black hover:-translate-y-1 transition-transform">
               <Icons.pinterest className="w-6 h-6" />
             </a>
-            <a href="https://www.linkedin.com/in/sainiamit01/" target="_blank" rel="noreferrer" className="text-gray-600 hover:text-black hover:-translate-y-1 transition-transform">
+            <a href="https://www.linkedin.com/in/sainiamit01/" target="_blank" rel="noreferrer" aria-label="LinkedIn" className="text-gray-600 hover:text-black hover:-translate-y-1 transition-transform">
               <Icons.linkedin className="w-6 h-6" />
             </a>
           </div>

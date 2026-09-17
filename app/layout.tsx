@@ -41,7 +41,6 @@ import { getCurrentUser } from "@/lib/session";
 import { AuthStoreProvider } from "@/store/useAuthStore";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
-import Script from "next/script";
 
 import { GoogleAnalytics } from '@next/third-parties/google';
 
@@ -54,7 +53,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       className={`${spaceGrotesk.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       </head>
       <body className="min-h-full flex flex-col">
         <AuthStoreProvider user={user}>

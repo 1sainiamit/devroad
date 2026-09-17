@@ -1,0 +1,18 @@
+# Devroad
+
+Devroad is a platform for creators, developers, and designers to sell digital products, courses, and software seamlessly.
+
+## Key Features
+- Sell digital downloads
+- Accept payments easily
+- Clean and minimal dashboard for creators
+- Fast and responsive checkout
+
+## Tech Stack
+- Frontend: Next.js, React, Tailwind CSS
+- Backend: Next.js API Routes, Prisma
+- Database: PostgreSQL
+- Payments: Razorpay (India & Global) / Stripe
+
+## Contact
+For any support or business inquiries, please reach out via our contact channels.
