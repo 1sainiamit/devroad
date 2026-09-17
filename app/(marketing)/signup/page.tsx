@@ -1,5 +1,13 @@
 import { SignupForm } from "@/components/auth/signup-form"
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Sign Up",
+  description: "Create a new Devroad account.",
+};
+
+
 export default function SignupPage() {
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 relative overflow-hidden bg-background">

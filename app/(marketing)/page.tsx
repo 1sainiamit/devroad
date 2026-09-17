@@ -1,8 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import Image from "next/image";
+
 import { ArrowRight, Star, Palette, Zap, Sparkles } from "lucide-react";
+
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Devroad - Sell Digital Products",
+  description: "The easiest way to sell your digital products online.",
+};
+
 
 export default function Home() {
   return (

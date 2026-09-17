@@ -1,6 +1,14 @@
 import { Search, Book, MessageCircle, AlertCircle, Settings, CreditCard } from "lucide-react";
 import Link from "next/link";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Help Center",
+  description: "Get help with your Devroad account and products.",
+};
+
+
 const helpCategories = [
   {
     title: "Getting Started",

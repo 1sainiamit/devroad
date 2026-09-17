@@ -13,8 +13,28 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Devroad",
-  description: "A platform for creators to sell digital products",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://devroad-wheat.vercel.app"),
+  title: {
+    default: "Devroad | Sell Digital Products",
+    template: "%s | Devroad",
+  },
+  description: "A premium platform for creators, developers, and designers to sell digital products, courses, and software seamlessly.",
+  keywords: ["digital products", "creators", "sell online", "courses", "software", "ecommerce", "digital downloads"],
+  authors: [{ name: "Devroad" }],
+  creator: "Devroad",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    title: "Devroad | Sell Digital Products",
+    description: "A premium platform for creators, developers, and designers to sell digital products, courses, and software seamlessly.",
+    siteName: "Devroad",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Devroad | Sell Digital Products",
+    description: "A premium platform for creators, developers, and designers to sell digital products, courses, and software seamlessly.",
+  },
 };
 
 import { getCurrentUser } from "@/lib/session";
@@ -23,7 +43,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import Script from "next/script";
 
-export default async function RootLayout({ children }: LayoutProps<"/">) {
+import { GoogleAnalytics } from '@next/third-parties/google';
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
 
   return (
@@ -32,7 +54,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${spaceGrotesk.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="beforeInteractive" />
+        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       </head>
       <body className="min-h-full flex flex-col">
         <AuthStoreProvider user={user}>
@@ -41,6 +63,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
             <Toaster position="bottom-right" />
           </TooltipProvider>
         </AuthStoreProvider>
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || "G-J7K962GWZ3"} />
       </body>
     </html>
   );

@@ -6,6 +6,14 @@ import Link from "next/link";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Purchase Successful",
+  description: "Thank you for your purchase.",
+};
+
+
 export default function SuccessPage() {
   const clearCart = useCartStore((state) => state.clearCart);
 

@@ -1,5 +1,13 @@
 import { Users, Globe2, MessageSquare, Zap } from "lucide-react";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Community",
+  description: "Join the community of creators building on Devroad.",
+};
+
+
 export default function CommunityPage() {
   return (
     <div className="min-h-screen bg-[#F4F4F0] pt-24 pb-20">

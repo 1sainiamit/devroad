@@ -1,3 +1,11 @@
+
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "Our privacy policy and how we protect your data.",
+};
+
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-[#F4F4F0] pt-24 pb-20">

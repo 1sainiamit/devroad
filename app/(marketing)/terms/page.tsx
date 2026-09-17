@@ -1,3 +1,11 @@
+
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description: "Our terms of service for using Devroad.",
+};
+
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-[#F4F4F0] pt-24 pb-20">

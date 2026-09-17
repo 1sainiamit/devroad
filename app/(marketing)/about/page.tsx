@@ -1,5 +1,13 @@
 import Image from "next/image";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About Us",
+  description: "Learn more about our mission and the team behind Devroad.",
+};
+
+
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-[#F4F4F0] pt-24 pb-20">

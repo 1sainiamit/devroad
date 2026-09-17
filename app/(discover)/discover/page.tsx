@@ -1,3 +1,11 @@
+
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Discover",
+  description: "Explore amazing digital products from independent creators.",
+};
+
 import prisma from "@/lib/prisma";
 import { ProductCard } from "@/components/products/product-card";
 import { getCurrentUser } from "@/lib/session";

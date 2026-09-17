@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Blog",
+  description: "Read the latest updates, tips, and stories from Devroad.",
+};
+
+
 const blogPosts = [
   {
     title: "How to Make Your First $1,000 on Devroad",

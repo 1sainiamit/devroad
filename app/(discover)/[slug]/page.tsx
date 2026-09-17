@@ -5,6 +5,40 @@ import { getCurrentUser } from "@/lib/session";
 import { BuyButton } from "@/components/storefront/buy-button";
 import { User, ShieldCheck, Star } from "lucide-react";
 import Link from "next/link";
+import { Metadata } from "next";
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> }
+): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await prisma.product.findFirst({
+    where: { slug },
+    include: { creator: true }
+  });
+
+  if (!product) {
+    return { title: "Product Not Found" };
+  }
+
+  const creatorName = product.creator.name || product.creator.username || "Anonymous";
+  const description = product.description?.substring(0, 160) || `Check out ${product.name} by ${creatorName} on Devroad.`;
+
+  return {
+    title: product.name,
+    description: description,
+    openGraph: {
+      title: product.name,
+      description: description,
+      images: product.coverImageUrl ? [product.coverImageUrl] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description: description,
+      images: product.coverImageUrl ? [product.coverImageUrl] : [],
+    },
+  };
+}
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

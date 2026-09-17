@@ -3,6 +3,44 @@ import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/products/product-card";
 import { UserCircle } from "lucide-react";
 import Image from "next/image";
+import { Metadata } from "next";
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ username: string }> }
+): Promise<Metadata> {
+  const { username } = await params;
+  const creator = await prisma.user.findFirst({
+    where: { 
+      OR: [
+        { username: username },
+        { id: username }
+      ]
+    },
+  });
+
+  if (!creator) {
+    return { title: "Creator Not Found" };
+  }
+
+  const displayName = creator.name || creator.username || "Anonymous";
+  const description = creator.bio?.substring(0, 160) || `Check out ${displayName}'s digital products on Devroad.`;
+
+  return {
+    title: `${displayName} (@${creator.username})`,
+    description: description,
+    openGraph: {
+      title: `${displayName} (@${creator.username})`,
+      description: description,
+      images: creator.avatarUrl ? [creator.avatarUrl] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${displayName} (@${creator.username})`,
+      description: description,
+      images: creator.avatarUrl ? [creator.avatarUrl] : [],
+    },
+  };
+}
 
 export default async function CreatorProfilePage({
   params,

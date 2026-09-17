@@ -1,6 +1,14 @@
 import { Check, Sparkles, Zap, Globe, Shield, Paintbrush } from "lucide-react";
 import Link from "next/link";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Features",
+  description: "Everything you need to sell your digital products online.",
+};
+
+
 const features = [
   {
     title: "Sell anywhere, anytime.",
